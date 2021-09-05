@@ -1,11 +1,8 @@
-import { factors, l, v, permutations, insertEach, sort } from "../src/library";
+import { pick } from "../src/util";
 
 describe("factors", () => {
     it("{1, 2, 3, 6} are the factors of 6", () => {
-        const result = sort(l([3, 2, 2]), l([2, 2, 3]))
-        if (result.kind === 'Iterable') {
-            console.log([...result.iterable])
-        }
+        console.log(pick(['a', 'b', 'c', 'd', 'e']))
     })
 
     it("[1, 1, 2, 3, 6]", () => {

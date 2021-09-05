@@ -1,5 +1,5 @@
 import { arrayEquals, isSorted, permutations } from "./util"
-import { adhoc2, empty, fromArray, notEnoughKnowns, Relation1, Relation2, Relation3, Result1, Result2, Result3, singleton2, singleton3, Term } from "./Relation"
+import { adhoc2, empty, fromArray, lift, notEnoughKnowns, Relation1, Relation2, Relation3, Result1, Result2, Result3, singleton2, singleton3, Term } from "./Relation"
 
 export const add: Relation3<number, number, number> = (x, y, out) => {
     if (x.kind === 'Known' && y.kind === 'Known' && out.kind === 'Known') {
@@ -196,10 +196,6 @@ export function sorted<T>(array: Term<T[]>): Result1<T[]> {
     
 }
 
-export const isNat: Relation1<number> = x => {
-
-}
-
 function len<T>(array: T[]): number {
     return array.length
 }
@@ -211,6 +207,8 @@ function setSize<T>(set: Set<T>): number {
 }
 
 export const size = adhoc2(setSize)
+
+const x = lift(sine)
 
 /*
     isEvenNat(X) :-

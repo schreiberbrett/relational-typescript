@@ -43,3 +43,16 @@ export function insertEach<T>(needle: T, haystack: T[]): T[][] {
 
     return result
 }
+
+export function pick<T>(array: T[]): [T, T[]][] {
+    let result = new Array<[T, T[]]>()
+    for (let i = 0; i < array.length; i++) {
+        const first: T[] = array.slice(0, i)
+        const middle: T = array[i]
+        const rest: T[] = array.slice(i + 1, array.length + 1)
+
+        result.push([middle, [...first, ...rest]])
+    }
+
+    return result
+}
