@@ -1,5 +1,5 @@
 import { add, sine } from "./library"
-import { Result1, Result2, Result3, NotEnoughKnowns, fromArray2 } from "./Result"
+import { Result1, Result2, Result3, NotEnoughKnowns, fromArray2, f } from "./Result"
 import { pick } from "./util"
 
 export type Term<T> = {
@@ -37,9 +37,85 @@ export interface Relation3<A, B, C> {
     (a: Term<A>, b: Term<B>, c: Term<C>): Result3<A, B, C>
 }
 
-export const allNegative: Relation1<number[]> = x => {
 
+export function relation1<A>(
+    f1: (a: A) => Result1<A>,
+    f2: ()     => Result1<A>,
+): Relation1<A> {
+    return a => {
+               if (a.kind === 'Known'  ) {
+            return f1(a.value)
+        } else /* (a.kind === 'Unknown') */ {
+            return f2()
+        }
+    }
 }
+
+export function relation2<A, B>(
+    f1: (a: A, b: B) => Result2<A, B>,
+    f2: (a: A)       => Result2<A, B>,
+    f3: (b: B)       => Result2<A, B>,
+    f4: ()           => Result2<A, B>
+): Relation2<A, B> {
+    return (a, b) => {
+               if (a.kind === 'Known'   && b.kind === 'Known') {
+            return f1(a.value, b.value)
+        } else if (a.kind === 'Known'   && b.kind === 'Unknown') {
+            return f2(a.value)
+        } else if (a.kind === 'Unknown' && b.kind === 'Known') {
+            return f3(b.value)
+        } else /* (a.kind === 'Unknown' && b.kind === 'Unknown') */ {
+            return f4()
+        }
+    }
+}
+
+export function relation3<A, B, C>(
+    f1: (a: A, b: B, c: C) => Result3<A, B, C>,
+    f2: (a: A, b: B      ) => Result3<A, B, C>,
+    f3: (a: A,       c: C) => Result3<A, B, C>,
+    f4: (a: A            ) => Result3<A, B, C>,
+    f5: (      b: B, c: C) => Result3<A, B, C>,
+    f6: (      b: B      ) => Result3<A, B, C>,
+    f7: (            c: C) => Result3<A, B, C>,
+    f8: (                ) => Result3<A, B, C>,
+): Relation3<A, B, C> {
+    return (a, b, c) => {
+               if (a.kind === 'Known'   && b.kind === 'Known'   && c.kind === 'Known') {
+            return f1(a.value, b.value, c.value)
+        } else if (a.kind === 'Known'   && b.kind === 'Known'   && c.kind === 'Unknown') {
+            return f2(a.value, b.value)
+        } else if (a.kind === 'Known'   && b.kind === 'Unknown' && c.kind === 'Known') {
+            return f3(a.value, c.value)
+        } else if (a.kind === 'Known'   && b.kind === 'Unknown' && c.kind === 'Unknown') {
+            return f4(a.value)
+        } else if (a.kind === 'Unknown' && b.kind === 'Known'   && c.kind === 'Known') {
+            return f5(b.value, c.value)
+        } else if (a.kind === 'Unknown' && b.kind === 'Known'   && c.kind === 'Unknown') {
+            return f6(b.value)
+        } else if (a.kind === 'Unknown' && b.kind === 'Unknown' && c.kind === 'Known') {
+            return f7(c.value)
+        } else /* (a.kind === 'Unknown' && b.kind === 'Unknown' && c.kind === 'Unknown') */ {
+            return f8()
+        }
+    }
+}
+
+export function table3<A, B, C>(table: [A, B, C][]): Relation3<A, B, C> {
+    return (a, b, c) => {
+        return {
+            kind: 'Iterable3',
+            iterable: table.filter(([trueA, trueB, trueC]) => {
+                const aMatches = a.kind !== 'Known' || a.value === trueA
+                const bMatches = b.kind !== 'Known' || b.value === trueB
+                const cMatches = c.kind !== 'Known' || c.value === trueC
+
+                return aMatches && bMatches && cMatches
+            })
+        }
+    }
+}
+
 
 // Adapted from https://unsafe-perform.io/posts/2020-02-21-existential-quantification-in-typescript
 

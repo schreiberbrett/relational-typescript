@@ -56,3 +56,38 @@ export function pick<T>(array: T[]): [T, T[]][] {
 
     return result
 }
+
+// TODO: See if this is accurate
+export function isNat(x: number): boolean {
+    return (x >= 0) && (Math.floor(x) === x)
+}
+
+export function setEquals<T>(a: Set<T>, b: Set<T>): boolean {
+    for (let x of a.values()) {
+        if (!b.has(x)) {
+            return false
+        }
+    }
+
+    for (let x of b.values()) {
+        if (!a.has(x)) {
+            return false
+        }
+    }
+
+    return true
+}
+
+export function maximum(array: number[]): number | null {
+    if (array.length === 0) {
+        return null
+    }
+
+    let [max, ...rest] = array
+
+    for (let x of rest) {
+        max = Math.max(max, x)
+    }
+
+    return max
+}
