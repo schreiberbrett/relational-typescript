@@ -19,14 +19,3 @@ export const square: Relation2<number, number> = (x, squared) => {
 
 }
 
-function len<T>(array: T[]): number {
-    return array.length
-}
-
-export const length = adhoc2(len)
-
-function setSize<T>(set: Set<T>): number {
-    return set.size
-}
-
-export const size = adhoc2(setSize)

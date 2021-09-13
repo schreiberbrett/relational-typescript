@@ -1,14 +1,19 @@
-import { add, sine } from "./library"
-import { Result1, Result2, Result3, NotEnoughKnowns, fromArray2, f } from "./Result"
+import { add } from "./relations/add"
+import { sine } from "./relations/trigonometry"
+import { Result1, Result2, Result3 } from "./Result"
 import { pick } from "./util"
 
-export type Term<T> = {
+export interface Known<T> {
     kind: 'Known'
     value: T
-} | {
+}
+
+export interface Unknown {
     kind: 'Unknown'
     name: string
 }
+
+export type Term<T> = Known<T> | Unknown
 
 // l for "literal"
 export function l<T>(value: T): Term<T> {
@@ -101,10 +106,85 @@ export function relation3<A, B, C>(
     }
 }
 
+
+export function relation2Named<A, B>(
+    f1: (a: A,      b: B) => Result2<A, B>,
+    f2: (a: A,      b: string) => Result2<A, B>,
+    f3: (a: string, b: B) => Result2<A, B>,
+    f4: (a: string, b: string) => Result2<A, B>,
+): Relation2<A, B> {
+    return (a, b) => {
+               if (a.kind === 'Known'   && b.kind === 'Known') {
+            return f1(a.value, b.value)
+        } else if (a.kind === 'Known'   && b.kind === 'Unknown') {
+            return f2(a.value, b.name)
+        } else if (a.kind === 'Unknown' && b.kind === 'Known') {
+            return f3(a.name,  b.value)
+        } else if (a.kind === 'Unknown' && b.kind === 'Unknown') {
+            return f4(a.name,  b.name)
+        }
+
+        // Unreachable
+        return null as any
+    }
+}
+
+
+
+export function relation3Named<A, B, C>(
+    f1: (a: A,      b: B,      c: C)      => Result3<A, B, C>,
+    f2: (a: A,      b: B,      c: string) => Result3<A, B, C>,
+    f3: (a: A,      b: string, c: C)      => Result3<A, B, C>,
+    f4: (a: A,      b: string, c: string) => Result3<A, B, C>,
+    f5: (a: string, b: B,      c: C)      => Result3<A, B, C>,
+    f6: (a: string, b: B,      c: string) => Result3<A, B, C>,
+    f7: (a: string, b: string, c: C)      => Result3<A, B, C>,
+    f8: (a: string, b: string, c: string) => Result3<A, B, C>
+): Relation3<A, B, C> {
+    return (a, b, c) => {
+               if (a.kind === 'Known'   && b.kind === 'Known'   && c.kind === 'Known') {
+            return f1(a.value, b.value, c.value)
+        } else if (a.kind === 'Known'   && b.kind === 'Known'   && c.kind === 'Unknown') {
+            return f2(a.value, b.value, c.name)
+        } else if (a.kind === 'Known'   && b.kind === 'Unknown' && c.kind === 'Known') {
+            return f3(a.value, b.name,  c.value)
+        } else if (a.kind === 'Known'   && b.kind === 'Unknown' && c.kind === 'Unknown') {
+            return f4(a.value, b.name,  c.name)
+        } else if (a.kind === 'Unknown' && b.kind === 'Known'   && c.kind === 'Known') {
+            return f5(a.name,  b.value, c.value)
+        } else if (a.kind === 'Unknown' && b.kind === 'Known'   && c.kind === 'Unknown') {
+            return f6(a.name,  b.value, c.name)
+        } else if (a.kind === 'Unknown' && b.kind === 'Unknown' && c.kind === 'Known') {
+            return f7(a.name,  b.name,  c.value)
+        } else if (a.kind === 'Unknown' && b.kind === 'Unknown' && c.kind === 'Unknown') {
+            return f8(a.name,  b.name,  c.name)
+        }
+
+        // Unreachable
+        return null as any
+    }
+}
+
+
+export function table2<A, B>(table: [A, B][]): Relation2<A, B> {
+    return (a, b) => {
+        return {
+            kind: 'Success',
+            iterable: table.filter(([trueA, trueB]) => {
+                const aMatches = a.kind !== 'Known' || a.value === trueA
+                const bMatches = b.kind !== 'Known' || b.value === trueB
+
+                return aMatches && bMatches
+            })
+        }
+    }
+}
+
+
 export function table3<A, B, C>(table: [A, B, C][]): Relation3<A, B, C> {
     return (a, b, c) => {
         return {
-            kind: 'Iterable3',
+            kind: 'Success',
             iterable: table.filter(([trueA, trueB, trueC]) => {
                 const aMatches = a.kind !== 'Known' || a.value === trueA
                 const bMatches = b.kind !== 'Known' || b.value === trueB

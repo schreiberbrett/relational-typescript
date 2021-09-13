@@ -27,7 +27,7 @@ export const factors = relation2<number, Set<number>>(
     },
 
     () => ({
-        kind: 'Iterable2',
+        kind: 'Success',
         iterable: function*() {
             let product = 1 // must be a natural number >= 1
             while (true) {

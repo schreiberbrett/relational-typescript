@@ -61,14 +61,32 @@ export function cons<T>(first: Term<T>, rest: Term<T[]>, out: Term<T[]>): Result
 }
 
 export function reverse<T>(a: Term<T[]>, b: Term<T[]>): Result2<T[], T[]> {
-    // TODO
+    // TODO together
 }
 
 export function permutation<T>(a: Term<T[]>, b: Term<T[]>): Result2<T[], T[]> {
-    // TODO
+    if (a.kind === 'Known' && b.kind === 'Known') {
+        const sortedA = [...a.value].sort()
+        const sortedB = [...b.value].sort()
+
+        return arrayEquals(sortedA, sortedB)
+            ? singleton2(a.value, b.value)
+            : empty2()
+    }
+
+    if (a.kind === 'Known' && b.kind === 'Unknown') {
+        return fromArray2(permutations(a.value).map(x => [a.value, x]))
+    }
+
+    if (a.kind === 'Unknown' && b.kind === 'Known') {
+        return fromArray2(permutations(b.value).map(x => [x, b.value]))
+    }
+
+
+    return notEnoughKnowns()
 }
 
 
 export function zip<A, B>(as: Term<A[]>, bs: Term<B[]>, pairs: Term<[A, B][]>): Result3<A[], B[], [A, B][]> {
-    // TODO
+    // TODO together
 }

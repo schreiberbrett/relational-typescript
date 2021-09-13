@@ -1,5 +1,7 @@
 import { Relation2, Relation3 } from "../Relation"
 
+// TODO together
+
 export const and: Relation3<boolean, boolean, boolean> = (a, b, out) => {
 
 }
